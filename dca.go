@@ -1,15 +1,8 @@
 package dca
 
 import (
-	"fmt"
 	"math"
 )
-
-// first test of package and github sync
-func Hello(name string) string {
-	message := fmt.Sprintf("Hi, %v. Welcome!", name)
-	return message
-}
 
 func Hyperbolic(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int, delay int32) {
 	var ai, aim, ai_exp, aim_exp, N float64
