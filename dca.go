@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func Hyperbolic(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int, delay int32) {
+func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int, delay int32) {
 	var ai, aim, ai_exp, aim_exp, N float64
 	var t_exp_sw, stop int
 
