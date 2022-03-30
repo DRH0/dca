@@ -4,6 +4,9 @@ import (
 	"math"
 )
 
+// 	Populates a previously allocated 2d array with a decline curve table
+//	Table columns:
+// 	[index][monthly production][start][end][nom month][nom year][effective %]
 func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int, delay int32) {
 	var ai, aim, ai_exp, aim_exp, N float64
 	var t_exp_sw, stop int
@@ -62,4 +65,16 @@ func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt floa
 			result[i][0] += float64(delay)
 		}
 	}
+}
+
+//	Converts B to H
+func BtoH(n_b float64, d_b float64) float64 {
+	var ai float64 = (1 / n_b * (math.Pow(1-d_b/100, -n_b) - 1) / 12)
+	return (1 - math.Exp(-12*(ai))) * 100
+}
+
+//	Converts H to B
+func HtoB(n_h float64, d_h float64) float64 {
+	var ai float64 = -math.Log(1-d_h/100) / 12
+	return (1 - math.Pow(1/(12*ai*n_h+1), 1/n_h)) * 100
 }
