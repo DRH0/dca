@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+//	these functions are in prz
 func Make2df64(rows int, cols int) [][]float64 {
 	table := make([][]float64, rows)
 	chunk := make([]float64, cols*rows)
@@ -34,7 +35,7 @@ func TestDeclineCurve(t *testing.T) {
 		result [][]float64
 	}{
 		{"Test 1", 25000, 80, 1.2, 7, 10, 0, Make2df64(10, 7)},
-		{"Test 2", 25000, 99.9999, 0, 7, 10, 0, Make2df64(10, 7)},
+		{"Test 2", 25000, 0.01, 0, 7, 10, 0, Make2df64(10, 7)},
 	}
 
 	for _, tt := range tests {
