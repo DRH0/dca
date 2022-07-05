@@ -4,7 +4,8 @@ import (
 	"math"
 )
 
-// 	Populates a previously allocated 2d array with a decline curve table
+// 	Populates a previously allocated 2d array with a decline curve table.
+//  If you want exponential decline just use 0 for the n parameter.
 //	Table columns:
 // 	[index][monthly production][start][end][nom month][nom year][effective %]
 func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int, delay int32) {
