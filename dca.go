@@ -4,22 +4,36 @@ import (
 	"math"
 )
 
-func InitialVariables(Qi float64, Di float64, n float64, Dt float64, length int) (float64, float64, float64, int) {
+type ForecastTable struct {
+	Qi         float64
+	Di         float64
+	N          float64
+	Dt         float64
+	method     string
+	length     int
+	month      []int
+	production []float64
+	forecast   []float64
+}
+
+//	This gets the initial variables for a procedural decline calculation
+func InitialVariables(Qi float64, Di float64, n float64, method string, Dt float64, length int) (float64, float64, float64, int) {
 	var ai, aim, ai_exp, aim_exp, N float64
 	var t_exp_sw, stop int
+	if n == 1 {
+		n = 0.9998
+	}
 	if n == 0 {
+		t_exp_sw = 0
 		ai = -math.Log(1 - (Di / 100))
 		aim = ai / 12
-	} else if n == 1 {
-		N = 0.9998
-		ai = ((1 / N) * (math.Pow((1-(Di/100)), -N) - 1))
-		aim = ai / 12
-		ai_exp = -math.Log(1 - (Dt / 100))
-		aim_exp = ai_exp / 12
-		t_exp_sw = int((ai/(-math.Log(1-(Dt/100))) - 1) / (ai * N) * 12)
 	} else {
 		N = n
-		ai = ((1 / N) * (math.Pow((1-(Di/100)), -N) - 1))
+		if method == "B" {
+			ai = ((1 / N) * (math.Pow((1-(Di/100)), -N) - 1))
+		} else {
+			ai = -math.Log(1 - (Di / 100))
+		}
 		aim = ai / 12
 		ai_exp = -math.Log(1 - (Dt / 100))
 		aim_exp = ai_exp / 12
@@ -37,8 +51,10 @@ func InitialVariables(Qi float64, Di float64, n float64, Dt float64, length int)
 //	If you want exponential decline just use 0 for the n parameter.
 //	Table columns:
 // 	[index][monthly production][start][end][nom month][nom year][effective %]
-func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt float64, length int) {
-	var aim, aim_exp, N, stop = InitialVariables(Qi, Di, n, Dt, length)
+func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, method string, Dt float64, length int) {
+	var aim, aim_exp, N, stop = InitialVariables(Qi, Di, n, method, Dt, length)
+	//	n=0 means exponential decline from the beginning
+
 	if n == 0 {
 		for i := 0; i < stop; i++ {
 			result[i][0] = float64(i)
@@ -47,6 +63,7 @@ func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt floa
 			result[i][1] = (result[i][2] / aim) * (1 - math.Exp(-aim))
 		}
 	} else {
+		//	Hyperbolic decline before switch to exponential
 		for i := 0; i < stop; i++ {
 			result[i][0] = float64(i)
 			result[i][3] = Qi / math.Pow(1+aim*(result[i][0]+1)*N, 1/N)
@@ -56,6 +73,7 @@ func DeclineCurve(result [][]float64, Qi float64, Di float64, n float64, Dt floa
 			result[i][6] = (1 - (1 / math.Pow(1+result[i][5]*N, 1/N))) * 100
 			result[i][1] = ((result[i][2] / (result[i][4] * (1 - N))) * (1 - (1 / math.Pow((1+result[i][4]*N), ((1-N)/N)))))
 		}
+		//	exponential decline after switch
 		for i := stop; i < length; i++ {
 			result[i][0] = float64(i)
 			result[i][2] = result[int(i)-1][3]
